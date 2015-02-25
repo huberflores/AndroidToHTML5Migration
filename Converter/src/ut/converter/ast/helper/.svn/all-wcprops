@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/OlegPetshjonkin/!svn/ver/14/Converter/src/ut/converter/ast/helper
+END
+ViewClassConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/OlegPetshjonkin/!svn/ver/14/Converter/src/ut/converter/ast/helper/ViewClassConverter.java
+END
+BaseClassConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/OlegPetshjonkin/!svn/ver/14/Converter/src/ut/converter/ast/helper/BaseClassConverter.java
+END
+ActivityClassConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/OlegPetshjonkin/!svn/ver/14/Converter/src/ut/converter/ast/helper/ActivityClassConverter.java
+END
+ClassRemover.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/OlegPetshjonkin/!svn/ver/14/Converter/src/ut/converter/ast/helper/ClassRemover.java
+END
+ThreadClassConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/OlegPetshjonkin/!svn/ver/14/Converter/src/ut/converter/ast/helper/ThreadClassConverter.java
+END

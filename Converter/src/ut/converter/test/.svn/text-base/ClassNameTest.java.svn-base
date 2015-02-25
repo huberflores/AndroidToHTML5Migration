@@ -1,0 +1,31 @@
+package ut.converter.test;
+
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+import ut.converter.ast.ClassName;
+
+public class ClassNameTest {
+
+	@Test public void testConstructor() {
+		ClassName cn = new ClassName("abc.def.Name");
+		assertEquals("abc.def.Name", cn.name());
+		assertEquals(3, cn.splitName().size());
+		assertEquals("abc", cn.splitName().get(0));
+		assertEquals("def", cn.splitName().get(1));
+		assertEquals("Name", cn.splitName().get(2));
+		
+		cn = new ClassName("Name2");
+		assertEquals("Name2", cn.name());
+		assertEquals(1, cn.splitName().size());
+		
+		cn = new ClassName("abc.def.*");
+		assertEquals("abc.def.*", cn.name());
+		assertEquals(3, cn.splitName().size());
+		assertEquals("abc", cn.splitName().get(0));
+		assertEquals("def", cn.splitName().get(1));
+		assertEquals("*", cn.splitName().get(2));
+	}
+
+}

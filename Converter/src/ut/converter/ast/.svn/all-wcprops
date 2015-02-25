@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/OlegPetshjonkin/!svn/ver/14/Converter/src/ut/converter/ast
+END
+SrcGenerator.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/OlegPetshjonkin/!svn/ver/10/Converter/src/ut/converter/ast/SrcGenerator.java
+END
+SrcProcessor.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/OlegPetshjonkin/!svn/ver/14/Converter/src/ut/converter/ast/SrcProcessor.java
+END
+JavaLexer.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/OlegPetshjonkin/!svn/ver/14/Converter/src/ut/converter/ast/JavaLexer.java
+END
+Java.tokens
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/OlegPetshjonkin/!svn/ver/10/Converter/src/ut/converter/ast/Java.tokens
+END
+ASTUtil.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/OlegPetshjonkin/!svn/ver/14/Converter/src/ut/converter/ast/ASTUtil.java
+END
+ClassName.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/OlegPetshjonkin/!svn/ver/14/Converter/src/ut/converter/ast/ClassName.java
+END
+SrcPreprocessor.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/OlegPetshjonkin/!svn/ver/14/Converter/src/ut/converter/ast/SrcPreprocessor.java
+END
+JavaParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/OlegPetshjonkin/!svn/ver/14/Converter/src/ut/converter/ast/JavaParser.java
+END

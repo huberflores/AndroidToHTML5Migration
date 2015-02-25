@@ -1,0 +1,285 @@
+package ut.converter.ast;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.tree.BaseTree;
+import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.Tree;
+
+public class ASTUtil {
+	public static final boolean DEBUG = false;
+	
+	
+	public static List<CommonTree> findNode(CommonTree tree, int type) {
+		List <CommonTree> nodes = new ArrayList<CommonTree>();
+		find(tree, tree, type, nodes, true, true);
+		return nodes;
+	}
+	
+	public static List<CommonTree> findNode(CommonTree tree, int type, boolean allowRecursiveTypeSearch, boolean allowRecursiveRootTypeSearch) {
+		List <CommonTree> nodes = new ArrayList<CommonTree>();
+		find(tree, tree, type, nodes, allowRecursiveTypeSearch, allowRecursiveRootTypeSearch);
+		return nodes;
+	}
+	
+	public static List<CommonTree> findChildren(CommonTree tree, int type) {
+		List <CommonTree> nodes = new ArrayList<CommonTree>();
+		@SuppressWarnings("unchecked")
+		List<CommonTree>  children = tree.getChildren();
+		if (children != null) {
+			for (CommonTree child : children) {
+				if (child.getType() == type) {
+					nodes.add(child);
+				}
+			}
+		}
+		return nodes;
+	}
+	
+	public static List<ClassName> extractTypes(CommonTree typesRootTree, List<ClassName> imports) {
+		List<CommonTree> types = findChildren(typesRootTree, JavaLexer.TYPE);
+		List<ClassName> ret = new ArrayList<ClassName>();
+		for (CommonTree type : types) {
+			CommonTree typeTree = (CommonTree) type.getChild(0);
+			ClassName typeClass = new ClassName(typeTree);
+			ClassName typeFullName = typeClass.getFirstBackwardEquals(imports);
+			ret.add(typeFullName != null ? typeFullName : typeClass);	
+		}
+		return ret;
+	}
+	
+	public static CommonTree getTypeNode(CommonTree typesRootTree, List<ClassName> imports, ClassName className) {
+		List<CommonTree> types = findChildren(typesRootTree, JavaLexer.TYPE);
+		for (CommonTree type : types) {
+			CommonTree typeTree = (CommonTree) type.getChild(0);
+			ClassName typeClass = new ClassName(typeTree);
+			ClassName typeFullName = typeClass.getFirstBackwardEquals(imports);
+			if (typeFullName == null) {
+				typeFullName = typeClass;
+			}
+			if (className.equals(typeFullName)) {
+				return type;
+			}
+		}
+		return null;
+	}
+	
+	public static void insertNode(CommonTree root, CommonTree node, int index) {
+		root.insertChild(index, node);
+	}
+	
+	public static CommonTree findChild(CommonTree tree, int type) {
+		@SuppressWarnings("unchecked")
+		List<CommonTree>  children = tree.getChildren();
+		if (children != null) {
+			for (CommonTree child : children) {
+				if (child.getType() == type) {
+					return child;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public static CommonTree findPrevousSibling(CommonTree tree, int type) {
+		CommonTree parent = (CommonTree) tree.getParent();
+		int index = tree.getChildIndex();
+		for (int i = index -1; i >=0; i--) {
+			CommonTree child = (CommonTree) parent.getChild(i);
+			if (type == -1 || child.getType() == type) {
+				return child;
+			}
+		}
+		return null;
+	}
+	
+	public static CommonTree findNextSibling(CommonTree tree, int type) {
+		CommonTree parent = (CommonTree) tree.getParent();
+		int index = tree.getChildIndex();
+		for (int i = index + 1; i < parent.getChildCount(); i++) {
+			CommonTree child = (CommonTree) parent.getChild(i);
+			if (type == -1 || child.getType() == type) {
+				return child;
+			}
+		}
+		return null;
+	}
+	
+	public static void removeNode(CommonTree tree) {
+		Tree parent = tree.getParent();
+		parent.deleteChild(tree.getChildIndex());
+	}
+	
+	public static void removeChildren(CommonTree tree) {
+		for (int i = tree.getChildCount()-1 ; i >= 0; i--) {
+			tree.deleteChild(i);
+		}
+	}
+	
+	public static boolean checkParameter(List<ClassName> imports, CommonTree paremeterNode, ClassName className) {
+		boolean ret = false;
+		CommonTree typeToken = (CommonTree) paremeterNode.getChild(0); // TYPE node
+		CommonTree typeTree = (CommonTree) typeToken.getChild(0);
+		ClassName typeClass = new ClassName(typeTree);
+		ClassName typeFullName = typeClass.getFirstBackwardEquals(imports);
+		if (typeFullName == null) {
+			typeFullName = typeClass;
+		} 
+		if (className.equals(typeFullName)) {
+			ret = true;
+		}
+		return ret;
+	}
+	
+	private static void find(CommonTree root, CommonTree tree, int type, List<CommonTree> nodes, boolean searchDeep, boolean recursiveRoot) {
+		if (tree == null) {
+			return;
+		}
+		boolean found = false;
+		if (tree.getType() == type) {
+			nodes.add(tree);
+			found = true;
+		}
+		
+		if (!found || searchDeep) {
+			@SuppressWarnings("unchecked")
+			List<CommonTree>  children = tree.getChildren();
+			if (children != null) {
+				for (CommonTree child : children) {
+					if (recursiveRoot || root.getType() != child.getType()) {
+						find(root, child, type, nodes, searchDeep, recursiveRoot);
+					}
+				}
+			}
+		}
+	}
+	
+	public static String getPackageName(BaseTree packageNode) {
+		StringBuilder sb = new StringBuilder();
+		if (packageNode.getType() == JavaLexer.PACKAGE) {
+			processBinary(packageNode.getChild(0), sb, 0);
+		}
+		return sb.toString();
+	}
+	
+	public static String getImport(BaseTree importNode) {
+		StringBuilder sb = new StringBuilder();
+		if (importNode.getType() == JavaLexer.IMPORT) {
+			processBinary(importNode.getChild(0), sb, 0);
+		}
+		return sb.toString();
+	}
+	
+	public static Tree getRightMostNode(Tree node) {
+		if (node == null) {
+			return null; 
+		}
+		int childCount = node.getChildCount();
+		if (childCount == 0) {
+			return node;
+		}
+		
+		return getRightMostNode(node.getChild(childCount -1));
+		
+	}
+	
+	public static void processBinary(Tree node, final StringBuilder sb, int level) {
+		processBinary(node, new IBinaryTreeProcessor() {
+			@Override public void process(Tree node) {
+				sb.append(node.getText());
+			}
+		} , level);
+		
+	}
+	
+	public static void processBinary(Tree node, IBinaryTreeProcessor processor, int level) {
+		if (node == null) {
+			return; 
+		}
+		int childCount = node.getChildCount();
+		if (childCount == 0) {
+			processor.process(node);
+			if (DEBUG) {
+				for (int i = 0 ; i < level ; i++) {
+					System.out.print("\t");
+				}
+				System.out.println(node.getType()+":"+node.getText() + ":["+node.getLine()+"]");
+			}
+			return;
+		}
+		if (childCount == 2) {
+			processBinary(node.getChild(0), processor, level+1);
+			processor.process(node);
+			if (DEBUG) {
+				for (int i = 0 ; i < level ; i++) {
+					System.out.print("\t");
+				}
+				System.out.println(node.getType()+":"+node.getText() + ":["+node.getLine()+"]");
+			}
+			processBinary(node.getChild(1), processor, level+1);
+		} 
+	}
+	
+	public static void replaceNode(CommonTree tree, CommonTree toReplace) {
+		int index = tree.getChildIndex();
+		Tree parent = tree.getParent();
+		parent.setChild(index, toReplace);
+	}
+	
+	public static CommonTree addRootTo(CommonTree original, CommonToken token) {
+		CommonTree copy = new CommonTree(original.getToken());
+		copyTreeRecursive(copy, original);
+		CommonTree ret = new CommonTree(token);
+		copy.setParent(ret);
+		ret.addChild(copy);
+		return ret;
+	}
+	
+	public static CommonTree copyTree(CommonTree original) {
+		CommonTree copy = new CommonTree(original.getToken());
+		copyTreeRecursive(copy, original);
+		return copy;
+	}
+
+	private static void copyTreeRecursive(CommonTree copy, CommonTree original) {
+		if (original.getChildren() != null) {
+			for (Object o : original.getChildren()) {
+
+				CommonTree originalChild = (CommonTree) o;
+
+				// get the token from the original child node
+				CommonToken oTok = (CommonToken) originalChild.getToken();
+
+				// create a new token with the same type & text as 'oTok'
+				CommonToken cTok = new CommonToken(oTok.getType(),
+						oTok.getText());
+
+				// copy all attributes from 'oTok' to 'cTok'
+				cTok.setLine(oTok.getLine());
+				cTok.setCharPositionInLine(oTok.getCharPositionInLine());
+				cTok.setChannel(oTok.getChannel());
+				cTok.setStartIndex(oTok.getStartIndex());
+				cTok.setStopIndex(oTok.getStopIndex());
+				cTok.setTokenIndex(oTok.getTokenIndex());
+
+				// create a new tree node with the 'cTok' as token
+				CommonTree copyChild = new CommonTree(cTok);
+
+				// set the parent node of the child node
+				copyChild.setParent(copy);
+
+				// add the child to the parent node
+				copy.addChild(copyChild);
+
+				// make a recursive call to copy deeper
+				copyTreeRecursive(copyChild, originalChild);
+			}
+		}
+	}
+	
+	public static interface IBinaryTreeProcessor {
+		public void process(Tree node);
+	}
+}
